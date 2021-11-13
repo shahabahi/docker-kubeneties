@@ -1,0 +1,63 @@
+version: '3.7'
+services:
+  mongodb:
+    image: mongo:latest
+#    env_file:
+#      - ./env/mongo.env
+    container_name: mongodb
+    hostname: mongodb
+    ports:
+      - '27018:27018'
+    volumes:
+      - mongoData:/data/db
+    command: mongod --port 27018 --bind_ip_all
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    env_file:
+      - ./env/mongo.env
+    depends_on:
+      - mongodb
+    ports:
+      - '8081:8081'
+  configserver:
+    build: ./appapiconfigserver
+    ports:
+      - '8012:8012'
+    volumes:
+      - configserverlogs:/workspace/logs
+    env_file:
+      - ./env/configserver.env
+    depends_on:
+      - mongodb
+  discoveryservice:
+    build: ./appdiscoveryservice
+    ports:
+      - '8010:8010'
+    volumes:
+      - discoveryservicelogs:/workspace/logs
+    env_file:
+      - ./env/discoveryservice.env
+    depends_on:
+      - mongodb
+      - configserver
+  apigateway:
+    build: ./apigatewayn
+    ports:
+      - '8082:8082'
+    volumes:
+      - apigatewaylogs:/workspace/logs
+    env_file:
+      - ./env/apigateway.env
+    depends_on:
+      - mongodb
+      - configserver
+      - discoveryservice
+
+volumes:
+  mongoData:
+    external: true
+  configserverlogs:
+  discoveryservicelogs:
+  apigatewaylogs:
+
