@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  name: micro-webapi-discovery-service
+  labels:
+    group: web-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: discoveryservice
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: discoveryservice
+        tier: backend
+    spec:
+      containers:
+        - image: 12482/micro-webapi_discoveryservice:1
+          name: discoveryservice
+          resources: {hub.docker.com}
+status: {}
